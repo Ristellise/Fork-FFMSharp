@@ -611,6 +611,35 @@
             <exception cref="T:System.ObjectDisposedException">Trying to access data from an invalidated Frame, see <see cref="T:FFMSSharp.Frame"/>.</exception>
             <seealso cref="P:FFMSSharp.Frame.ColorRange"/>
         </member>
+        <member name="P:FFMSSharp.Frame.ColorPrimaries">
+            <summary>
+            Identifies the color primaries of the frame
+            </summary>
+            <remarks>
+            <para>In FFMS2, the equivalent is <c>FFMS_Frame-&gt;ColorPrimaries</c>.</para>
+            </remarks>
+            <exception cref="T:System.ObjectDisposedException">Trying to access data from an invalidated Frame, see <see cref="T:FFMSSharp.Frame"/>.</exception>
+            <seealso cref="P:FFMSSharp.Frame.ColorPrimaries"/>
+        </member>
+        <member name="P:FFMSSharp.Frame.TransferCharacteristics">
+            <summary>
+            Identifies the transfer characteristics of the frame
+            </summary>
+            <remarks>
+            <para>In FFMS2, the equivalent is <c>FFMS_Frame-&gt;TransferCharateristics</c>.</para>
+            </remarks>
+            <exception cref="T:System.ObjectDisposedException">Trying to access data from an invalidated Frame, see <see cref="T:FFMSSharp.Frame"/>.</exception>
+            <seealso cref="T:FFMSSharp.TransferCharacteristic"/>
+        </member>
+        <member name="P:FFMSSharp.Frame.ChromaLocation">
+            <summary>
+            Specifies the chroma location in the frame
+            </summary>
+            <remarks>
+            <para>In FFMS2, the equivalent is <c>FFMS_Frame-&gt;ChromaLocation</c>.</para>
+            </remarks>
+            <exception cref="T:System.ObjectDisposedException">Trying to access data from an invalidated Frame, see <see cref="T:FFMSSharp.Frame"/>.</exception>
+        </member>
         <member name="P:FFMSSharp.Frame.Bitmap">
             <summary>
             Turn the pixel data into a <see cref="P:FFMSSharp.Frame.Bitmap">Bitmap</see>
@@ -808,6 +837,7 @@
             </remarks>
             <param name="indexFile">Can be an absolute or relative path</param>
             <exception cref="T:System.IO.IOException">Trying to read an invalid index file.</exception>
+            <exception cref="T:System.IO.FileNotFoundException">Trying to read an index file that does not exist.</exception>
             <exception cref="T:System.NotSupportedException">Trying to read an index file for a <see cref="P:FFMSSharp.Index.Source">Source</see> that is not available in the ffms2.dll.</exception>
         </member>
         <member name="M:FFMSSharp.Index.Dispose">
@@ -888,7 +918,9 @@
             <seealso cref="M:FFMSSharp.Index.AudioSource(System.String,System.Int32,FFMSSharp.AudioDelayMode)"/>
             <seealso cref="M:FFMSSharp.Index.GetFirstTrackOfType(FFMSSharp.TrackType)"/>
             <seealso cref="M:FFMSSharp.Index.GetFirstIndexedTrackOfType(FFMSSharp.TrackType)"/>
-            <exception cref="T:System.IO.FileLoadException">Failure to open the <paramref name="sourceFile"/></exception>
+            <exception cref="T:System.ArgumentException">Failure to open the <paramref name="sourceFile"/></exception>
+            <exception cref="T:System.IO.FileNotFoundException">Trying to read a file that does not exist</exception>
+            <exception cref="T:System.NotSupportedException">Trying to read a video format not supported by the FFMS2 build</exception>
             <exception cref="T:System.ArgumentException">Trying to make a VideoSource out of an invalid track</exception>
             <exception cref="T:System.InvalidOperationException">Supplying the wrong <paramref name="sourceFile"/></exception>
         </member>
@@ -907,7 +939,9 @@
             <seealso cref="M:FFMSSharp.Index.VideoSource(System.String,System.Int32,System.Int32,FFMSSharp.SeekMode)"/>
             <seealso cref="M:FFMSSharp.Index.GetFirstTrackOfType(FFMSSharp.TrackType)"/>
             <seealso cref="M:FFMSSharp.Index.GetFirstIndexedTrackOfType(FFMSSharp.TrackType)"/>
-            <exception cref="T:System.IO.FileLoadException">Failure to open the <paramref name="sourceFile"/></exception>
+            <exception cref="T:System.ArgumentException">Failure to open the <paramref name="sourceFile"/></exception>
+            <exception cref="T:System.IO.FileNotFoundException">Trying to read a file that does not exist.</exception>
+            <exception cref="T:System.NotSupportedException">Trying to read an audio format not supported by the FFMS2 build</exception>
             <exception cref="T:System.ArgumentException">Trying to make a AudioSource out of an invalid track</exception>
             <exception cref="T:System.InvalidOperationException">Supplying the wrong <paramref name="sourceFile"/></exception>
         </member>
@@ -944,7 +978,7 @@
             <remarks>
             <para>In FFMS2, the equivalent is <c>FFMS_GetErrorHandling</c>.</para>
             </remarks>
-            <seealso cref="M:FFMSSharp.Indexer.Index(System.Collections.Generic.IEnumerable{System.Int32},System.Collections.Generic.IEnumerable{System.Int32},System.String,FFMSSharp.IndexErrorHandling)"/>
+            <seealso cref="M:FFMSSharp.Indexer.Index(FFMSSharp.IndexErrorHandling)"/>
         </member>
         <member name="P:FFMSSharp.Index.NumberOfTracks">
             <summary>
@@ -1062,7 +1096,7 @@
             <returns>Track type</returns>
             <seealso cref="P:FFMSSharp.Track.TrackType"/>
             <exception cref="T:System.ArgumentOutOfRangeException">Trying to access a Track that doesn't exist.</exception>
-            <exception cref="T:System.ObjectDisposedException">Calling this function after you have already called <see cref="M:FFMSSharp.Indexer.Index(System.Collections.Generic.IEnumerable{System.Int32},System.Collections.Generic.IEnumerable{System.Int32},System.String,FFMSSharp.IndexErrorHandling)"/>.</exception>
+            <exception cref="T:System.ObjectDisposedException">Calling this function after you have already called <see cref="M:FFMSSharp.Indexer.Index(FFMSSharp.IndexErrorHandling)"/>.</exception>
         </member>
         <member name="M:FFMSSharp.Indexer.GetCodecName(System.Int32)">
             <summary>
@@ -1073,20 +1107,44 @@
             </remarks>
             <param name="track">Track number</param>
             <returns>The human-readable name ("long name" in FFmpeg terms) of the codec</returns>
-            <exception cref="T:System.ArgumentOutOfRangeException">Trying to access a Track that doesn't exist.</exception>
-            <exception cref="T:System.ObjectDisposedException">Calling this function after you have already called <see cref="M:FFMSSharp.Indexer.Index(System.Collections.Generic.IEnumerable{System.Int32},System.Collections.Generic.IEnumerable{System.Int32},System.String,FFMSSharp.IndexErrorHandling)"/>.</exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">Trying to access a track that doesn't exist.</exception>
+            <exception cref="T:System.ObjectDisposedException">Calling this function after you have already called <see cref="M:FFMSSharp.Indexer.Index(FFMSSharp.IndexErrorHandling)"/>.</exception>
         </member>
-        <member name="M:FFMSSharp.Indexer.Index(System.Collections.Generic.IEnumerable{System.Int32},System.Collections.Generic.IEnumerable{System.Int32},System.String,FFMSSharp.IndexErrorHandling)">
+        <member name="M:FFMSSharp.Indexer.SetTrackIndexSettings(System.Int32,System.Boolean,System.Boolean)">
             <summary>
-            Index the media file
+            Enable or disable indexing of a track
             </summary>
             <remarks>
-            <para>In FFMS2, the equivalent is <c>FFMS_DoIndexing</c>.</para>
-            <para>By default, you will index all <see cref="F:FFMSSharp.TrackType.Audio">Audio</see> tracks.</para>
+            <para>In FFMS2, the equivalent is <c>FFMS_TrackIndexSettings</c>.</para>
             </remarks>
-            <param name="audioIndex">A list of specific <see cref="F:FFMSSharp.TrackType.Audio">Audio</see> tracks to index</param>
-            <param name="audioDump">A list of <see cref="F:FFMSSharp.TrackType.Audio">Audio</see> tracks to dump while indexing</param>
-            <param name="audioDumpFileName">The filename format for audio tracks getting dumped
+            <param name="track">Track number</param>
+            <param name="index">Index this track?</param>
+            <param name="dump">During indexing, dump the decoded audio to a file.</param>
+            <exception cref="T:System.ArgumentOutOfRangeException">Trying to specify a track that doesn't exist.</exception>
+            <exception cref="T:System.ObjectDisposedException">Calling this function after you have already called <see cref="M:FFMSSharp.Indexer.Index(FFMSSharp.IndexErrorHandling)"/>.</exception>
+            <seealso cref="M:FFMSSharp.Indexer.SetTrackTypeIndexSettings(FFMSSharp.TrackType,System.Boolean,System.Boolean)"/>
+            <seealso cref="M:FFMSSharp.Indexer.SetAudioNameFormat(System.String)"/>
+        </member>
+        <member name="M:FFMSSharp.Indexer.SetTrackTypeIndexSettings(FFMSSharp.TrackType,System.Boolean,System.Boolean)">
+            <summary>
+            Enable or disable indexing of all tracks of a given type
+            </summary>
+            <remarks>
+            <para>In FFMS2, the equivalent is <c>FFMS_TrackTypeIndexSettings</c>.</para>
+            </remarks>
+            <param name="trackType">Type of tracks to target</param>
+            <param name="index">Index these tracks?</param>
+            <param name="dump">During indexing, dump the decoded audio to a file.</param>
+            <exception cref="T:System.ObjectDisposedException">Calling this function after you have already called <see cref="M:FFMSSharp.Indexer.Index(FFMSSharp.IndexErrorHandling)"/>.</exception>
+            <seealso cref="M:FFMSSharp.Indexer.SetTrackIndexSettings(System.Int32,System.Boolean,System.Boolean)"/>
+            <seealso cref="M:FFMSSharp.Indexer.SetAudioNameFormat(System.String)"/>
+        </member>
+        <member name="M:FFMSSharp.Indexer.SetAudioNameFormat(System.String)">
+            <summary>
+            Choose the filename for audio track dumping
+            </summary>
+            <remarks>
+            <para>This is not a standard C# format function. Regular formatting rules will not apply.</para>
             <para>The following variables can be used:</para>
             <para><c>%sourcefile%</c> - same as the source file name, i.e. the file the audio is decoded from</para>
             <para><c>%trackn%</c> - the track number</para>
@@ -1095,7 +1153,21 @@
             <para><c>%channels%</c> - number of audio channels</para>
             <para><c>%bps%</c> - bits per sample</para>
             <para><c>%delay%</c> - delay, or more exactly the first timestamp encountered in the audio stream</para>
-            <para>Example string: <c>%sourcefile%_track%trackzn%.w64</c></para></param>
+            <para>Example string: <c>%sourcefile%_track%trackzn%.w64</c></para>
+            <para>In FFMS2, the equivalent is <c>FFMS_SetAudioNameCallback</c>.</para>
+            </remarks>
+            <param name="format">The filename format</param>
+            <exception cref="T:System.ObjectDisposedException">Calling this function after you have already called <see cref="M:FFMSSharp.Indexer.Index(FFMSSharp.IndexErrorHandling)"/>.</exception>
+            <exception cref="T:System.ArgumentNullException">Specifiying a null string as a format.</exception>
+        </member>
+        <member name="M:FFMSSharp.Indexer.Index(FFMSSharp.IndexErrorHandling)">
+            <summary>
+            Index the media file
+            </summary>
+            <remarks>
+            <para>In FFMS2, the equivalent is <c>FFMS_DoIndexing</c>.</para>
+            <para>By default, you will only index <see cref="F:FFMSSharp.TrackType.Video">Video</see>.</para>
+            </remarks>
             <param name="indexErrorHandling">Control behavior when a decoding error is encountered</param>
             <returns>The generated <see cref="T:FFMSSharp.Index">Index</see> object</returns>
             <event cref="E:FFMSSharp.Indexer.UpdateIndexProgress">Called to give you an update on indexing progress</event>
@@ -1103,7 +1175,7 @@
             <exception cref="T:System.NotSupportedException">Attempting to index a codec not supported by the indexer</exception>
             <exception cref="T:System.IO.InvalidDataException">Failure to index a file that should be supported</exception>
             <exception cref="T:System.OperationCanceledException">Canceling the indexing process</exception>
-            <exception cref="T:System.ObjectDisposedException">Calling this function after you have already called <see cref="M:FFMSSharp.Indexer.Index(System.Collections.Generic.IEnumerable{System.Int32},System.Collections.Generic.IEnumerable{System.Int32},System.String,FFMSSharp.IndexErrorHandling)"/>.</exception>
+            <exception cref="T:System.ObjectDisposedException">Calling this function after you have already called <see cref="M:FFMSSharp.Indexer.Index(FFMSSharp.IndexErrorHandling)"/>.</exception>
         </member>
         <member name="P:FFMSSharp.Indexer.IsIndexing">
             <summary>
@@ -1151,6 +1223,31 @@
         <member name="E:FFMSSharp.Indexer.OnIndexingCompleted">
             <summary>
             Called when the indexing has finished
+            </summary>
+        </member>
+        <member name="T:FFMSSharp.Selection">
+            <summary>
+            Simple representation of a selection rectangle
+            </summary>
+        </member>
+        <member name="P:FFMSSharp.Selection.Top">
+            <summary>
+            Amount of Top to crop
+            </summary>
+        </member>
+        <member name="P:FFMSSharp.Selection.Left">
+            <summary>
+            Amount of Left to crop
+            </summary>
+        </member>
+        <member name="P:FFMSSharp.Selection.Right">
+            <summary>
+            Amount of Right to crop
+            </summary>
+        </member>
+        <member name="P:FFMSSharp.Selection.Bottom">
+            <summary>
+            Amount of Bottom to crop
             </summary>
         </member>
         <member name="T:FFMSSharp.TrackType">
@@ -1681,31 +1778,6 @@
         <member name="F:FFMSSharp.AVLogLevel.Debug">
             <summary>
             Stuff which is only useful for libav* developers
-            </summary>
-        </member>
-        <member name="T:FFMSSharp.Selection">
-            <summary>
-            Simple representation of a selection rectangle
-            </summary>
-        </member>
-        <member name="P:FFMSSharp.Selection.Top">
-            <summary>
-            Amount of Top to crop
-            </summary>
-        </member>
-        <member name="P:FFMSSharp.Selection.Left">
-            <summary>
-            Amount of Left to crop
-            </summary>
-        </member>
-        <member name="P:FFMSSharp.Selection.Right">
-            <summary>
-            Amount of Right to crop
-            </summary>
-        </member>
-        <member name="P:FFMSSharp.Selection.Bottom">
-            <summary>
-            Amount of Bottom to crop
             </summary>
         </member>
         <member name="T:FFMSSharp.FFMS2">

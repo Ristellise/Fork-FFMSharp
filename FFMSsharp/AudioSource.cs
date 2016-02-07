@@ -425,7 +425,7 @@ namespace FFMSSharp
             if (err.ErrorType == FFMS_Errors.FFMS_ERROR_SEEKING && err.SubType == FFMS_Errors.FFMS_ERROR_CODEC)
                 throw new NotSupportedException(err.Buffer);
 
-            throw new NotImplementedException(string.Format(System.Globalization.CultureInfo.CurrentCulture, "Unknown FFMS2 error encountered: ({0}, {1}, '{2}'). Please report this issue on FFMSSharp's GitHub.", err.ErrorType, err.SubType, err.Buffer));
+            throw new NotImplementedException(string.Format(System.Globalization.CultureInfo.CurrentCulture, FFMS2.NotImplementedError, err.ErrorType, err.SubType, err.Buffer));
         }
 
         #endregion

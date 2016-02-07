@@ -36,8 +36,20 @@ namespace FFMSSharp
         [DllImport("ffms2.dll", SetLastError = false)]
         public static extern int FFMS_DefaultAudioFilename(string SourceFile, int Track, ref FFMS_AudioProperties AP, StringBuilder FileName, int FNSize, IntPtr Private);
 
+        [DllImport("ffms2.dll", SetLastError = false)]
+        public static extern void FFMS_TrackIndexSettings(SafeIndexerHandle Indexer, int Track, int Index, int Dump);
+
+        [DllImport("ffms2.dll", SetLastError = false)]
+        public static extern void FFMS_TrackTypeIndexSettings(SafeIndexerHandle Indexer, int TrackType, int Track, int Dump);
+
         [DllImport("ffms2.dll", SetLastError = false, BestFitMapping = false, ThrowOnUnmappableChar = true)]
-        public static extern SafeIndexHandle FFMS_DoIndexing(SafeIndexerHandle Indexer, int IndexMask, int DumpMask, TAudioNameCallback ANC, [MarshalAs(UnmanagedType.LPStr)] string ANCPrivate, int ErrorHandling, TIndexCallback IC, IntPtr ICPrivate, ref FFMS_ErrorInfo ErrorInfo);
+        public static extern void FFMS_SetAudioNameCallback(SafeIndexerHandle Indexer, TAudioNameCallback ANC, [MarshalAs(UnmanagedType.LPStr)] string ANCPrivate);
+
+        [DllImport("ffms2.dll", SetLastError = false)]
+        public static extern void FFMS_SetProgressCallback(SafeIndexerHandle Indexer, TIndexCallback IC, IntPtr ICPrivate);
+
+        [DllImport("ffms2.dll", SetLastError = false)]
+        public static extern SafeIndexHandle FFMS_DoIndexing2(SafeIndexerHandle Indexer, int ErrorHandling, ref FFMS_ErrorInfo ErrorInfo);
 
         public delegate int TAudioNameCallback(string SourceFile, int Track, ref FFMS_AudioProperties AP, StringBuilder FileName, int FNSize, IntPtr Private);
         public delegate int TIndexCallback(long Current, long Total, IntPtr ICPrivate);
@@ -215,12 +227,16 @@ namespace FFMSSharp
             byte[] sourceFileBytes = Encoding.UTF8.GetBytes(sourceFile);
             _handle = NativeMethods.FFMS_CreateIndexerWithDemuxer(sourceFileBytes, (int)demuxer, ref err);
 
-            if (!_handle.IsInvalid) return;
+            if (!_handle.IsInvalid)
+            {
+                NativeMethods.FFMS_SetProgressCallback(_handle, IndexingCallback, IntPtr.Zero);
+                return;
+            }
 
             if (err.ErrorType == FFMS_Errors.FFMS_ERROR_PARSER && err.SubType == FFMS_Errors.FFMS_ERROR_FILE_READ)
                 throw new System.IO.FileLoadException(err.Buffer);
 
-            throw new NotImplementedException(string.Format(System.Globalization.CultureInfo.CurrentCulture, "Unknown FFMS2 error encountered: ({0}, {1}, '{2}'). Please report this issue on FFMSSharp's GitHub.", err.ErrorType, err.SubType, err.Buffer));
+            throw new NotImplementedException(string.Format(System.Globalization.CultureInfo.CurrentCulture, FFMS2.NotImplementedError, err.ErrorType, err.SubType, err.Buffer));
         }
 
         /// <summary>
@@ -279,7 +295,7 @@ namespace FFMSSharp
         /// </remarks>
         /// <param name="track">Track number</param>
         /// <returns>The human-readable name ("long name" in FFmpeg terms) of the codec</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Trying to access a Track that doesn't exist.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Trying to access a track that doesn't exist.</exception>
         /// <exception cref="ObjectDisposedException">Calling this function after you have already called <see cref="Index"/>.</exception>
         public string GetCodecName(int track)
         {
@@ -291,6 +307,76 @@ namespace FFMSSharp
             return Marshal.PtrToStringAnsi(NativeMethods.FFMS_GetCodecNameI(_handle, track));
         }
 
+        /// <summary>
+        /// Enable or disable indexing of a track
+        /// </summary>
+        /// <remarks>
+        /// <para>In FFMS2, the equivalent is <c>FFMS_TrackIndexSettings</c>.</para>
+        /// </remarks>
+        /// <param name="track">Track number</param>
+        /// <param name="index">Index this track?</param>
+        /// <param name="dump">During indexing, dump the decoded audio to a file.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Trying to specify a track that doesn't exist.</exception>
+        /// <exception cref="ObjectDisposedException">Calling this function after you have already called <see cref="Index"/>.</exception>
+        /// <seealso cref="SetTrackTypeIndexSettings"/>
+        /// <seealso cref="SetAudioNameFormat"/>
+        public void SetTrackIndexSettings(int track, bool index, bool dump = false)
+        {
+            if (_handle.IsInvalid) throw new ObjectDisposedException(@"Indexer");
+
+            if (track < 0 || track > NativeMethods.FFMS_GetNumTracksI(_handle))
+                throw new ArgumentOutOfRangeException(@"track", "That track doesn't exist.");
+
+            NativeMethods.FFMS_TrackIndexSettings(_handle, track, index ? 1 : 0, dump ? 1 : 0);
+        }
+
+        /// <summary>
+        /// Enable or disable indexing of all tracks of a given type
+        /// </summary>
+        /// <remarks>
+        /// <para>In FFMS2, the equivalent is <c>FFMS_TrackTypeIndexSettings</c>.</para>
+        /// </remarks>
+        /// <param name="trackType">Type of tracks to target</param>
+        /// <param name="index">Index these tracks?</param>
+        /// <param name="dump">During indexing, dump the decoded audio to a file.</param>
+        /// <exception cref="ObjectDisposedException">Calling this function after you have already called <see cref="Index"/>.</exception>
+        /// <seealso cref="SetTrackIndexSettings"/>
+        /// <seealso cref="SetAudioNameFormat"/>
+        public void SetTrackTypeIndexSettings(TrackType trackType, bool index, bool dump = false)
+        {
+            if (_handle.IsInvalid) throw new ObjectDisposedException(@"Indexer");
+
+            NativeMethods.FFMS_TrackTypeIndexSettings(_handle, (int)trackType, index ? 1 : 0, dump ? 1 : 0);
+        }
+
+        /// <summary>
+        /// Choose the filename for audio track dumping
+        /// </summary>
+        /// <remarks>
+        /// <para>This is not a standard C# format function. Regular formatting rules will not apply.</para>
+        /// <para>The following variables can be used:</para>
+        /// <para><c>%sourcefile%</c> - same as the source file name, i.e. the file the audio is decoded from</para>
+        /// <para><c>%trackn%</c> - the track number</para>
+        /// <para><c>%trackzn%</c> - the track number zero padded to 2 digits</para>
+        /// <para><c>%samplerate%</c> - the audio sample rate</para>
+        /// <para><c>%channels%</c> - number of audio channels</para>
+        /// <para><c>%bps%</c> - bits per sample</para>
+        /// <para><c>%delay%</c> - delay, or more exactly the first timestamp encountered in the audio stream</para>
+        /// <para>Example string: <c>%sourcefile%_track%trackzn%.w64</c></para>
+        /// <para>In FFMS2, the equivalent is <c>FFMS_SetAudioNameCallback</c>.</para>
+        /// </remarks>
+        /// <param name="format">The filename format</param>
+        /// <exception cref="ObjectDisposedException">Calling this function after you have already called <see cref="Index"/>.</exception>
+        /// <exception cref="ArgumentNullException">Specifiying a null string as a format.</exception>
+        public void SetAudioNameFormat(string format)
+        {
+            if (_handle.IsInvalid) throw new ObjectDisposedException(@"Indexer");
+
+            if (format == null) throw new ArgumentNullException(@"format");
+
+            NativeMethods.FFMS_SetAudioNameCallback(_handle, AudioNameCallback, format);
+        }
+
         #endregion
 
         #region Object creation
@@ -300,20 +386,8 @@ namespace FFMSSharp
         /// </summary>
         /// <remarks>
         /// <para>In FFMS2, the equivalent is <c>FFMS_DoIndexing</c>.</para>
-        /// <para>By default, you will index all <see cref="TrackType.Audio">Audio</see> tracks.</para>
+        /// <para>By default, you will only index <see cref="TrackType.Video">Video</see>.</para>
         /// </remarks>
-        /// <param name="audioIndex">A list of specific <see cref="TrackType.Audio">Audio</see> tracks to index</param>
-        /// <param name="audioDump">A list of <see cref="TrackType.Audio">Audio</see> tracks to dump while indexing</param>
-        /// <param name="audioDumpFileName">The filename format for audio tracks getting dumped
-        /// <para>The following variables can be used:</para>
-        /// <para><c>%sourcefile%</c> - same as the source file name, i.e. the file the audio is decoded from</para>
-        /// <para><c>%trackn%</c> - the track number</para>
-        /// <para><c>%trackzn%</c> - the track number zero padded to 2 digits</para>
-        /// <para><c>%samplerate%</c> - the audio sample rate</para>
-        /// <para><c>%channels%</c> - number of audio channels</para>
-        /// <para><c>%bps%</c> - bits per sample</para>
-        /// <para><c>%delay%</c> - delay, or more exactly the first timestamp encountered in the audio stream</para>
-        /// <para>Example string: <c>%sourcefile%_track%trackzn%.w64</c></para></param>
         /// <param name="indexErrorHandling">Control behavior when a decoding error is encountered</param>
         /// <returns>The generated <see cref="FFMSSharp.Index">Index</see> object</returns>
         /// <event cref="UpdateIndexProgress">Called to give you an update on indexing progress</event>
@@ -322,24 +396,9 @@ namespace FFMSSharp
         /// <exception cref="System.IO.InvalidDataException">Failure to index a file that should be supported</exception>
         /// <exception cref="OperationCanceledException">Canceling the indexing process</exception>
         /// <exception cref="ObjectDisposedException">Calling this function after you have already called <see cref="Index"/>.</exception>
-        public Index Index(IEnumerable<int> audioIndex = null, IEnumerable<int> audioDump = null, string audioDumpFileName = null, IndexErrorHandling indexErrorHandling = IndexErrorHandling.Abort)
+        public Index Index(IndexErrorHandling indexErrorHandling = IndexErrorHandling.Abort)
         {
             if (_handle.IsInvalid) throw new ObjectDisposedException(@"Indexer");
-
-            var indexMask = -1;
-            if (audioIndex != null)
-            {
-                indexMask = audioIndex.Aggregate(0, (current, track) => current | (1 << track));
-            }
-
-            var dumpMask = 0;
-            if (audioDump != null)
-            {
-                if (audioDumpFileName == null)
-                    throw new ArgumentNullException(@"audioDumpFileName", "You must specify a filename format if you want to dump audio files.");
-
-                dumpMask = audioDump.Aggregate(dumpMask, (current, track) => current | (1 << track));
-            }
 
             var err = new FFMS_ErrorInfo
             {
@@ -352,7 +411,7 @@ namespace FFMSSharp
 
             lock (this)
             {
-                index = NativeMethods.FFMS_DoIndexing(_handle, indexMask, dumpMask, AudioNameCallback, audioDumpFileName, (int)indexErrorHandling, IndexingCallback, IntPtr.Zero, ref err);
+                index = NativeMethods.FFMS_DoIndexing2(_handle, (int)indexErrorHandling, ref err);
             }
 
             _handle.SetHandleAsInvalid(); // "Note that calling this function destroys the FFMS_Indexer object and frees the memory allocated by FFMS_CreateIndexer (even if indexing fails for any reason)."
@@ -370,8 +429,10 @@ namespace FFMSSharp
                 throw new OperationCanceledException(err.Buffer);
             if (err.ErrorType == FFMS_Errors.FFMS_ERROR_INDEXING && err.SubType == FFMS_Errors.FFMS_ERROR_PARSER)
                 throw new System.IO.InvalidDataException(err.Buffer);
+            if (err.ErrorType == FFMS_Errors.FFMS_ERROR_WAVE_WRITER && err.SubType == FFMS_Errors.FFMS_ERROR_FILE_WRITE)
+                throw new InvalidOperationException(err.Buffer);
 
-            throw new NotImplementedException(string.Format(System.Globalization.CultureInfo.CurrentCulture, "Unknown FFMS2 error encountered: ({0}, {1}, '{2}'). Please report this issue on FFMSSharp's GitHub.", err.ErrorType, err.SubType, err.Buffer));
+            throw new NotImplementedException(string.Format(System.Globalization.CultureInfo.CurrentCulture, FFMS2.NotImplementedError, err.ErrorType, err.SubType, err.Buffer));
         }
 
         #endregion

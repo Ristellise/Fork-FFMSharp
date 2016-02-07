@@ -29,11 +29,48 @@ namespace FFMSSharp
         public char PictType;
         public int ColorSpace;
         public int ColorRange;
+        public int ColorPrimaries;
+        public int TransferCharacteristics;
+        public int ChromaLocation;
     }
 
     #endregion
 
     #region Constants
+
+    public enum ColorPrimaries
+    {
+        Reserved0 = 0,
+        BT709 = 1,
+        Unspecified = 2,
+        Reserved = 3,
+        BT470M = 4,
+        BT470BG = 5,
+        SMPTE170M = 6,
+        SMPTE240M = 7,
+        FILM = 8,
+        BT2020 = 9
+    }
+
+    public enum TransferCharacteristic
+    {
+	    FFMS_TRC_RESERVED0		= 0,
+	    FFMS_TRC_BT709			= 1,
+	    FFMS_TRC_UNSPECIFIED	= 2,
+	    FFMS_TRC_RESERVED		= 3,
+	    FFMS_TRC_GAMMA22		= 4,
+	    FFMS_TRC_GAMMA28		= 5,
+	    FFMS_TRC_SMPTE170M		= 6,
+	    FFMS_TRC_SMPTE240M		= 7,
+	    FFMS_TRC_LINEAR			= 8,
+	    FFMS_TRC_LOG			= 9,
+	    FFMS_TRC_LOG_SQRT		= 10,
+	    FFMS_TRC_IEC61966_2_4	= 11,
+	    FFMS_TRC_BT1361_ECG		= 12,
+	    FFMS_TRC_IEC61966_2_1	= 13,
+	    FFMS_TRC_BT2020_10		= 14,
+	    FFMS_TRC_BT2020_12		= 15
+    }
 
     /// <summary>
     /// Identifies the color coefficients used for a YUV stream
@@ -409,6 +446,59 @@ namespace FFMSSharp
                 if (Invalid) throw new ObjectDisposedException(@"Frame");
 
                 return (ColorRange)_nativeStruct.ColorRange;
+            }
+        }
+
+        /// <summary>
+        /// Identifies the color primaries of the frame
+        /// </summary>
+        /// <remarks>
+        /// <para>In FFMS2, the equivalent is <c>FFMS_Frame->ColorPrimaries</c>.</para>
+        /// </remarks>
+        /// <exception cref="ObjectDisposedException">Trying to access data from an invalidated Frame, see <see cref="Frame"/>.</exception>
+        /// <seealso cref="ColorPrimaries"/>
+        public ColorPrimaries ColorPrimaries
+        {
+            get
+            {
+                if (Invalid) throw new ObjectDisposedException(@"Frame");
+
+                return (ColorPrimaries)_nativeStruct.ColorPrimaries;
+            }
+        }
+
+        /// <summary>
+        /// Identifies the transfer characteristics of the frame
+        /// </summary>
+        /// <remarks>
+        /// <para>In FFMS2, the equivalent is <c>FFMS_Frame->TransferCharateristics</c>.</para>
+        /// </remarks>
+        /// <exception cref="ObjectDisposedException">Trying to access data from an invalidated Frame, see <see cref="Frame"/>.</exception>
+        /// <seealso cref="TransferCharacteristic"/>
+        public TransferCharacteristic TransferCharacteristics
+        {
+            get
+            {
+                if (Invalid) throw new ObjectDisposedException(@"Frame");
+
+                return (TransferCharacteristic)_nativeStruct.TransferCharacteristics;
+            }
+        }
+
+        /// <summary>
+        /// Specifies the chroma location in the frame
+        /// </summary>
+        /// <remarks>
+        /// <para>In FFMS2, the equivalent is <c>FFMS_Frame->ChromaLocation</c>.</para>
+        /// </remarks>
+        /// <exception cref="ObjectDisposedException">Trying to access data from an invalidated Frame, see <see cref="Frame"/>.</exception>
+        public int ChromaLocation
+        {
+            get
+            {
+                if (Invalid) throw new ObjectDisposedException(@"Frame");
+
+                return _nativeStruct.ChromaLocation;
             }
         }
 

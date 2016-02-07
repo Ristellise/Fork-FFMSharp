@@ -26,7 +26,7 @@ namespace FFMSSharp
         public static extern bool SetDllDirectoryW(string lpPathName);
 
         [DllImport("ffms2.dll", SetLastError = false)]
-        public static extern void FFMS_Init(int unused, int UseUTF8Paths);
+        public static extern void FFMS_Init(int unused, int unused2);
 
         [DllImport("ffms2.dll", SetLastError = false)]
         public static extern int FFMS_GetLogLevel();
@@ -149,6 +149,8 @@ namespace FFMSSharp
     {
         #region Properties
 
+        internal const string NotImplementedError = "Unknown FFMS2 error encountered: ({0}, {1}, '{2}'). Please report this issue on FFMSSharp's GitGud.";
+
         /// <summary>
         /// Is FFMS2 initialized?
         /// </summary>
@@ -246,7 +248,7 @@ namespace FFMSSharp
 
             try
             {
-                NativeMethods.FFMS_Init(0, 1);
+                NativeMethods.FFMS_Init(0, 0);
             }
             catch (BadImageFormatException)
             {
