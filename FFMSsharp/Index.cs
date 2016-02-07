@@ -466,8 +466,9 @@ namespace FFMSSharp
         /// <seealso cref="AudioSource"/>
         /// <seealso cref="GetFirstTrackOfType"/>
         /// <seealso cref="GetFirstIndexedTrackOfType"/>
-        /// <exception cref="System.IO.FileLoadException">Failure to open the <paramref name="sourceFile"/></exception>
-        /// <exception cref="System.IO.FileNotFoundException">Trying to read a file that does not exist.</exception>
+        /// <exception cref="ArgumentException">Failure to open the <paramref name="sourceFile"/></exception>
+        /// <exception cref="System.IO.FileNotFoundException">Trying to read a file that does not exist</exception>
+        /// <exception cref="NotSupportedException">Trying to read a video format not supported by the FFMS2 build</exception>
         /// <exception cref="ArgumentException">Trying to make a VideoSource out of an invalid track</exception>
         /// <exception cref="InvalidOperationException">Supplying the wrong <paramref name="sourceFile"/></exception>
         public VideoSource VideoSource(string sourceFile, int track, int threads = 1, SeekMode seekMode = SeekMode.Normal)
@@ -486,9 +487,11 @@ namespace FFMSSharp
             if (videoSource != IntPtr.Zero) return new VideoSource(videoSource);
 
             if (err.ErrorType == FFMS_Errors.FFMS_ERROR_PARSER && err.SubType == FFMS_Errors.FFMS_ERROR_FILE_READ)
-                throw new System.IO.FileLoadException(err.Buffer);
+                throw new ArgumentException(err.Buffer, @"sourceFile");
             if (err.ErrorType == FFMS_Errors.FFMS_ERROR_INDEX && err.SubType == FFMS_Errors.FFMS_ERROR_NO_FILE)
                 throw new System.IO.FileNotFoundException(err.Buffer);
+            if (err.ErrorType == FFMS_Errors.FFMS_ERROR_DECODING && err.SubType == FFMS_Errors.FFMS_ERROR_CODEC)
+                throw new NotSupportedException(err.Buffer);
             if (err.ErrorType == FFMS_Errors.FFMS_ERROR_INDEX && err.SubType == FFMS_Errors.FFMS_ERROR_INVALID_ARGUMENT)
                 throw new ArgumentException(err.Buffer);
             if (err.ErrorType == FFMS_Errors.FFMS_ERROR_INDEX && err.SubType == FFMS_Errors.FFMS_ERROR_FILE_MISMATCH)
@@ -511,8 +514,9 @@ namespace FFMSSharp
         /// <seealso cref="VideoSource"/>
         /// <seealso cref="GetFirstTrackOfType"/>
         /// <seealso cref="GetFirstIndexedTrackOfType"/>
-        /// <exception cref="System.IO.FileLoadException">Failure to open the <paramref name="sourceFile"/></exception>
+        /// <exception cref="ArgumentException">Failure to open the <paramref name="sourceFile"/></exception>
         /// <exception cref="System.IO.FileNotFoundException">Trying to read a file that does not exist.</exception>
+        /// <exception cref="NotSupportedException">Trying to read an audio format not supported by the FFMS2 build</exception>
         /// <exception cref="ArgumentException">Trying to make a AudioSource out of an invalid track</exception>
         /// <exception cref="InvalidOperationException">Supplying the wrong <paramref name="sourceFile"/></exception>
         public AudioSource AudioSource(string sourceFile, int track, AudioDelayMode delayMode = AudioDelayMode.FirstVideoTrack)
@@ -531,9 +535,11 @@ namespace FFMSSharp
             if (audioSource != IntPtr.Zero) return new AudioSource(audioSource);
 
             if (err.ErrorType == FFMS_Errors.FFMS_ERROR_PARSER && err.SubType == FFMS_Errors.FFMS_ERROR_FILE_READ)
-                throw new System.IO.FileLoadException(err.Buffer);
+                throw new ArgumentException(err.Buffer);
             if (err.ErrorType == FFMS_Errors.FFMS_ERROR_INDEX && err.SubType == FFMS_Errors.FFMS_ERROR_NO_FILE)
                 throw new System.IO.FileNotFoundException(err.Buffer);
+            if (err.ErrorType == FFMS_Errors.FFMS_ERROR_DECODING && err.SubType == FFMS_Errors.FFMS_ERROR_CODEC)
+                throw new NotSupportedException(err.Buffer);
             if (err.ErrorType == FFMS_Errors.FFMS_ERROR_INDEX && err.SubType == FFMS_Errors.FFMS_ERROR_INVALID_ARGUMENT)
                 throw new ArgumentException(err.Buffer);
             if (err.ErrorType == FFMS_Errors.FFMS_ERROR_INDEX && err.SubType == FFMS_Errors.FFMS_ERROR_FILE_MISMATCH)
