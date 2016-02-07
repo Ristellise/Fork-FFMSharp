@@ -149,6 +149,8 @@ namespace FFMSSharp
     {
         #region Properties
 
+        internal const string NotImplementedError = "Unknown FFMS2 error encountered: ({0}, {1}, '{2}'). Please report this issue on FFMSSharp's GitGud.";
+
         /// <summary>
         /// Is FFMS2 initialized?
         /// </summary>
