@@ -227,9 +227,11 @@ namespace FFMSSharp
             byte[] sourceFileBytes = Encoding.UTF8.GetBytes(sourceFile);
             _handle = NativeMethods.FFMS_CreateIndexerWithDemuxer(sourceFileBytes, (int)demuxer, ref err);
 
-            if (!_handle.IsInvalid) return;
-
-            NativeMethods.FFMS_SetProgressCallback(_handle, IndexingCallback, IntPtr.Zero);
+            if (!_handle.IsInvalid)
+            {
+                NativeMethods.FFMS_SetProgressCallback(_handle, IndexingCallback, IntPtr.Zero);
+                return;
+            }
 
             if (err.ErrorType == FFMS_Errors.FFMS_ERROR_PARSER && err.SubType == FFMS_Errors.FFMS_ERROR_FILE_READ)
                 throw new System.IO.FileLoadException(err.Buffer);
@@ -427,6 +429,8 @@ namespace FFMSSharp
                 throw new OperationCanceledException(err.Buffer);
             if (err.ErrorType == FFMS_Errors.FFMS_ERROR_INDEXING && err.SubType == FFMS_Errors.FFMS_ERROR_PARSER)
                 throw new System.IO.InvalidDataException(err.Buffer);
+            if (err.ErrorType == FFMS_Errors.FFMS_ERROR_WAVE_WRITER && err.SubType == FFMS_Errors.FFMS_ERROR_FILE_WRITE)
+                throw new InvalidOperationException(err.Buffer);
 
             throw new NotImplementedException(string.Format(System.Globalization.CultureInfo.CurrentCulture, "Unknown FFMS2 error encountered: ({0}, {1}, '{2}'). Please report this issue on FFMSSharp's GitHub.", err.ErrorType, err.SubType, err.Buffer));
         }
