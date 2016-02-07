@@ -6,10 +6,10 @@
     <title>$title$</title>
     <authors>$author$</authors>
     <owners>$author$</owners>
-    <licenseUrl>https://raw.githubusercontent.com/nixxquality/FFMSSharp/master/LICENSE</licenseUrl>
-    <projectUrl>https://github.com/nixxquality/FFMSSharp</projectUrl>
+    <licenseUrl>https://gitgud.io/nixx/FFMSSharp/raw/master/LICENSE</licenseUrl>
+    <projectUrl>https://gitgud.io/nixx/FFMSSharp/</projectUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>$description$</description>
-    <copyright>Copyright 2014</copyright>
+    <copyright>Copyright 2014, 2016</copyright>
   </metadata>
 </package>
