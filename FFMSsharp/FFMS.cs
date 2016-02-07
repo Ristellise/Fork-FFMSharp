@@ -26,7 +26,7 @@ namespace FFMSSharp
         public static extern bool SetDllDirectoryW(string lpPathName);
 
         [DllImport("ffms2.dll", SetLastError = false)]
-        public static extern void FFMS_Init(int unused, int UseUTF8Paths);
+        public static extern void FFMS_Init(int unused, int unused2);
 
         [DllImport("ffms2.dll", SetLastError = false)]
         public static extern int FFMS_GetLogLevel();
@@ -246,7 +246,7 @@ namespace FFMSSharp
 
             try
             {
-                NativeMethods.FFMS_Init(0, 1);
+                NativeMethods.FFMS_Init(0, 0);
             }
             catch (BadImageFormatException)
             {
