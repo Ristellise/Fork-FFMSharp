@@ -152,18 +152,17 @@ namespace Tests
             Assert.AreEqual(2, index.GetFirstIndexedTrackOfType(TrackType.Audio));
         }
 
-        /* Broken for god knows what reason
+        /* Still broken, but not on my end this time.
         [TestMethod]
         public void IndexAudioDump()
         {
             Indexer indexer = new Indexer("h264_720p_hp_5.1_3mbps_vorbis_styled_and_unstyled_subs_suzumiya.mkv");
 
             indexer.SetTrackIndexSettings(1, true, true);
-            indexer.SetAudioNameFormat(@"%sourcefile%_track%trackzn%.w64");
+            indexer.SetAudioNameFormat(@"test.wav");
 
             indexer.Index();
-        }
-         */
+        }*/
 
         [TestMethod]
         public void ReadIndex()

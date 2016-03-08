@@ -229,7 +229,8 @@ namespace FFMSSharp
 
             if (!_handle.IsInvalid)
             {
-                NativeMethods.FFMS_SetProgressCallback(_handle, IndexingCallback, IntPtr.Zero);
+                indexingCallbackInstance = new NativeMethods.TIndexCallback(IndexingCallback);
+                NativeMethods.FFMS_SetProgressCallback(_handle, indexingCallbackInstance, IntPtr.Zero);
                 return;
             }
 
@@ -374,7 +375,9 @@ namespace FFMSSharp
 
             if (format == null) throw new ArgumentNullException(@"format");
 
-            NativeMethods.FFMS_SetAudioNameCallback(_handle, AudioNameCallback, format);
+            audioNameCallbackInstance = new NativeMethods.TAudioNameCallback(AudioNameCallback);
+
+            NativeMethods.FFMS_SetAudioNameCallback(_handle, audioNameCallbackInstance, format);
         }
 
         #endregion
@@ -469,6 +472,9 @@ namespace FFMSSharp
             }
             return CancelIndexing ? 1 : 0;
         }
+
+        private NativeMethods.TIndexCallback indexingCallbackInstance;
+        private NativeMethods.TAudioNameCallback audioNameCallbackInstance;
 
         #endregion
     }
