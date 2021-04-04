@@ -18,19 +18,19 @@ namespace FFMSSharp
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     static partial class NativeMethods
     {
-        [DllImport("ffms2.dll", SetLastError = false)]
+        [DllImport("ffms2", SetLastError = false)]
         public static extern IntPtr FFMS_GetTimeBase(IntPtr T);
 
-        [DllImport("ffms2.dll", SetLastError = false)]
+        [DllImport("ffms2", SetLastError = false)]
         public static extern int FFMS_GetTrackType(IntPtr T);
 
-        [DllImport("ffms2.dll", SetLastError = false)]
+        [DllImport("ffms2", SetLastError = false)]
         public static extern int FFMS_GetNumFrames(IntPtr T);
 
-        [DllImport("ffms2.dll", SetLastError = false)]
+        [DllImport("ffms2", SetLastError = false)]
         public static extern IntPtr FFMS_GetFrameInfo(IntPtr T, int Frame);
 
-        [DllImport("ffms2.dll", SetLastError = false)]
+        [DllImport("ffms2", SetLastError = false)]
         public static extern int FFMS_WriteTimecodes(IntPtr T, byte[] TimecodeFile, ref FFMS_ErrorInfo ErrorInfo);
     }
 

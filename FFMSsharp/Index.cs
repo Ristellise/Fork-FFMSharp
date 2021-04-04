@@ -10,40 +10,40 @@ namespace FFMSSharp
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     static partial class NativeMethods
     {
-        [DllImport("ffms2.dll", SetLastError = false)]
+        [DllImport("ffms2", SetLastError = false)]
         public static extern SafeIndexHandle FFMS_ReadIndex(byte[] IndexFile, ref FFMS_ErrorInfo ErrorInfo);
 
-        [DllImport("ffms2.dll", SetLastError = false)]
+        [DllImport("ffms2", SetLastError = false)]
         public static extern void FFMS_DestroyIndex(IntPtr Index);
 
-        [DllImport("ffms2.dll", SetLastError = false)]
+        [DllImport("ffms2", SetLastError = false)]
         public static extern int FFMS_GetSourceType(SafeIndexHandle Index);
 
-        [DllImport("ffms2.dll", SetLastError = false)]
+        [DllImport("ffms2", SetLastError = false)]
         public static extern int FFMS_GetErrorHandling(SafeIndexHandle Index);
 
-        [DllImport("ffms2.dll", SetLastError = false)]
+        [DllImport("ffms2", SetLastError = false)]
         public static extern int FFMS_GetFirstTrackOfType(SafeIndexHandle Index, int TrackType, ref FFMS_ErrorInfo ErrorInfo);
 
-        [DllImport("ffms2.dll", SetLastError = false)]
+        [DllImport("ffms2", SetLastError = false)]
         public static extern int FFMS_GetFirstIndexedTrackOfType(SafeIndexHandle Index, int TrackType, ref FFMS_ErrorInfo ErrorInfo);
 
-        [DllImport("ffms2.dll", SetLastError = false)]
+        [DllImport("ffms2", SetLastError = false)]
         public static extern int FFMS_GetNumTracks(SafeIndexHandle Index);
 
-        [DllImport("ffms2.dll", SetLastError = false)]
+        [DllImport("ffms2", SetLastError = false)]
         public static extern int FFMS_WriteIndex(byte[] IndexFile, SafeIndexHandle TrackIndices, ref FFMS_ErrorInfo ErrorInfo);
 
-        [DllImport("ffms2.dll", SetLastError = false)]
+        [DllImport("ffms2", SetLastError = false)]
         public static extern int FFMS_IndexBelongsToFile(SafeIndexHandle Index, byte[] SourceFile, ref FFMS_ErrorInfo ErrorInfo);
 
-        [DllImport("ffms2.dll", SetLastError = false)]
+        [DllImport("ffms2", SetLastError = false)]
         public static extern IntPtr FFMS_CreateVideoSource(byte[] SourceFile, int Track, SafeIndexHandle Index, int Threads, int SeekMode, ref FFMS_ErrorInfo ErrorInfo);
 
-        [DllImport("ffms2.dll", SetLastError = false)]
+        [DllImport("ffms2", SetLastError = false)]
         public static extern IntPtr FFMS_CreateAudioSource(byte[] SourceFile, int Track, SafeIndexHandle Index, int DelayMode, ref FFMS_ErrorInfo ErrorInfo);
 
-        [DllImport("ffms2.dll", SetLastError = false)]
+        [DllImport("ffms2", SetLastError = false)]
         public static extern IntPtr FFMS_GetTrackFromIndex(SafeIndexHandle Index, int Track);
     }
 

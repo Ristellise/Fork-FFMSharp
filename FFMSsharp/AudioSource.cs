@@ -22,16 +22,16 @@ namespace FFMSSharp
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     static partial class NativeMethods
     {
-        [DllImport("ffms2.dll", SetLastError = false)]
+        [DllImport("ffms2", SetLastError = false)]
         public static extern IntPtr FFMS_GetAudioProperties(IntPtr A);
 
-        [DllImport("ffms2.dll", SetLastError = false)]
+        [DllImport("ffms2", SetLastError = false)]
         public static extern void FFMS_DestroyAudioSource(IntPtr A);
 
-        [DllImport("ffms2.dll", SetLastError = false)]
+        [DllImport("ffms2", SetLastError = false)]
         public static extern int FFMS_GetAudio(IntPtr A, byte[] Buf, long Start, long Count, ref FFMS_ErrorInfo ErrorInfo);
 
-        [DllImport("ffms2.dll", SetLastError = false)]
+        [DllImport("ffms2", SetLastError = false)]
         public static extern IntPtr FFMS_GetTrackFromAudio(IntPtr A);
     }
 

@@ -12,43 +12,43 @@ namespace FFMSSharp
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     static partial class NativeMethods
     {
-        [DllImport("ffms2.dll", SetLastError = false)]
+        [DllImport("ffms2", SetLastError = false)]
         public static extern SafeIndexerHandle FFMS_CreateIndexerWithDemuxer(byte[] SourceFile, int Demuxer, ref FFMS_ErrorInfo ErrorInfo);
 
-        [DllImport("ffms2.dll", SetLastError = false)]
+        [DllImport("ffms2", SetLastError = false)]
         public static extern void FFMS_CancelIndexing(IntPtr Indexer);
 
-        [DllImport("ffms2.dll", SetLastError = false)]
+        [DllImport("ffms2", SetLastError = false)]
         public static extern int FFMS_GetSourceTypeI(SafeIndexerHandle Indexer);
 
-        [DllImport("ffms2.dll", SetLastError = false)]
+        [DllImport("ffms2", SetLastError = false)]
         public static extern int FFMS_GetNumTracksI(SafeIndexerHandle Indexer);
 
-        [DllImport("ffms2.dll", SetLastError = false)]
+        [DllImport("ffms2", SetLastError = false)]
         public static extern int FFMS_GetTrackTypeI(SafeIndexerHandle Indexer, int Track);
 
-        [DllImport("ffms2.dll", SetLastError = false)]
+        [DllImport("ffms2", SetLastError = false)]
         public static extern IntPtr FFMS_GetCodecNameI(SafeIndexerHandle Indexer, int Track);
 
-        [DllImport("ffms2.dll", SetLastError = false)]
+        [DllImport("ffms2", SetLastError = false)]
         public static extern IntPtr FFMS_GetFormatNameI(SafeIndexerHandle Indexer);
 
-        [DllImport("ffms2.dll", SetLastError = false)]
+        [DllImport("ffms2", SetLastError = false)]
         public static extern int FFMS_DefaultAudioFilename(string SourceFile, int Track, ref FFMS_AudioProperties AP, StringBuilder FileName, int FNSize, IntPtr Private);
 
-        [DllImport("ffms2.dll", SetLastError = false)]
+        [DllImport("ffms2", SetLastError = false)]
         public static extern void FFMS_TrackIndexSettings(SafeIndexerHandle Indexer, int Track, int Index, int Dump);
 
-        [DllImport("ffms2.dll", SetLastError = false)]
+        [DllImport("ffms2", SetLastError = false)]
         public static extern void FFMS_TrackTypeIndexSettings(SafeIndexerHandle Indexer, int TrackType, int Track, int Dump);
 
-        [DllImport("ffms2.dll", SetLastError = false, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+        [DllImport("ffms2", SetLastError = false, BestFitMapping = false, ThrowOnUnmappableChar = true)]
         public static extern void FFMS_SetAudioNameCallback(SafeIndexerHandle Indexer, TAudioNameCallback ANC, [MarshalAs(UnmanagedType.LPStr)] string ANCPrivate);
 
-        [DllImport("ffms2.dll", SetLastError = false)]
+        [DllImport("ffms2", SetLastError = false)]
         public static extern void FFMS_SetProgressCallback(SafeIndexerHandle Indexer, TIndexCallback IC, IntPtr ICPrivate);
 
-        [DllImport("ffms2.dll", SetLastError = false)]
+        [DllImport("ffms2", SetLastError = false)]
         public static extern SafeIndexHandle FFMS_DoIndexing2(SafeIndexerHandle Indexer, int ErrorHandling, ref FFMS_ErrorInfo ErrorInfo);
 
         public delegate int TAudioNameCallback(string SourceFile, int Track, ref FFMS_AudioProperties AP, StringBuilder FileName, int FNSize, IntPtr Private);
